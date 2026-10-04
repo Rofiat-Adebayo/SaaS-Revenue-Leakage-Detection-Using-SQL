@@ -1,4 +1,4 @@
-# SaaS-Revenue-Leakage-Detection-Using-SQL
+# SaaS-Revenue-Leakage-Detection
 A SQL-based revenue assurance project designed to identify potential revenue leakage in a SaaS business by analysing under-billing, excessive discounts, product usage discrepancies, and overdue payments.
 
 ## Executive Summary
@@ -43,7 +43,6 @@ The final revenue leakage analysis identified **£2,124.00 in potential revenue 
 - Missed payments represented the **largest identified component** of potential leakage, accounting for approximately **56.5%** of the total.
 - Overall, the analysis identified **£2,124.00 in potential financial exposure** requiring further investigation.
 
-> **Note:** The figures represent potential revenue leakage identified from the sample data using the defined business rules.
 
 ## Business Problem
 
@@ -106,7 +105,8 @@ The project uses a relational data model consisting of six interconnected tables
 
 ### Entity Relationship Diagram
 
-<img width="1890" height="999" alt="Untitled (1)" src="https://github.com/user-attachments/assets/0069591c-fa94-4273-87a1-21a242c33f21" />
+<img width="2476" height="1111" alt="Untitled" src="https://github.com/user-attachments/assets/e89e68ff-2b12-4489-96cf-47d5cbf43af9" />
+
 
 
 
@@ -120,6 +120,7 @@ The project uses a relational data model consisting of six interconnected tables
 | `Billing` | Stores billing and payment information |
 | `Discounts` | Stores customer discounts |
 | `Product_Usage` | Stores customer product usage |
+
 
 ### Key Relationships
 
@@ -158,6 +159,7 @@ The relationships between the tables were designed to maintain referential integ
 - **Subscriptions → Product_Usage:**  
   Usage records are linked to the relevant subscription through `subscription_id`, allowing actual usage to be compared with the customer's subscribed product and included allowance.
 
+
   # Data Dictionary
 
 This data dictionary defines the key tables and fields used in the SaaS Revenue Leakage Detection project.
@@ -175,6 +177,7 @@ This data dictionary defines the key tables and fields used in the SaaS Revenue 
 | `activation_date` | Date the customer became active |
 | `customer_status` | Current status of the customer |
 
+
 ## Products
 
 | Column | Definition |
@@ -188,6 +191,7 @@ This data dictionary defines the key tables and fields used in the SaaS Revenue 
 | `extra_user_price` | Price charged for users above the included allowance |
 | `max_discount_pct` | Maximum discount percentage permitted for the product |
 | `product_status` | Current status of the product |
+
 
 ## Subscriptions
 
@@ -263,6 +267,7 @@ The checks focused on duplicate records, missing relationships, invalid financia
 | Invalid financial amounts | Identifies negative or otherwise invalid billing and discount amounts |
 | Invalid date relationships | Checks that billing periods, invoice dates, due dates, and payment dates follow logical chronological order |
 
+
 ### Results
 
 | Data Quality Check | Result |
@@ -274,11 +279,17 @@ The checks focused on duplicate records, missing relationships, invalid financia
 | Invalid financial amounts | 0 |
 | Invalid date relationships | 0 |
 
+
+
 The checks confirmed that no data quality issues were identified in the sample data that would prevent the revenue leakage analysis from being performed.
+
+[View Data quality check script](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Data%20quality%20check.sql)
+
 
 ## SQL Analysis
 
 The SQL analysis translates the business questions into measurable revenue leakage indicators using SQL Server. Each analysis focuses on a specific leakage area and produces a result that can be reviewed independently before being consolidated into the final revenue leakage summary.
+
 
 ### 1. Under-billing Analysis
 
@@ -290,22 +301,122 @@ Which customers were under-billed during the June–August 2026 review period, a
 
 A billing record is considered under-billed when the `billed_amount` is less than the `expected_amount`.
 
-```text
+```
 Potential Under-billing = Expected Amount - Billed Amount
 ```
 
-The analysis identified 4 customers with potential under-billing, resulting in a combined potential shortfall of £710.00 during the review period.
+  
+<details>
+<summary><strong>View SQL Query</strong></summary>
 
+```sql
+/* Detect under-billed customers
+   Identifying customers whose billed amount is consistently
+   lower than their subscription plan cost. */
+
+SELECT
+    B.customer_id,
+    COUNT(*) AS Total_Bills,
+    SUM(
+        CASE
+            WHEN B.billed_amount < S.contracted_price THEN 1
+            ELSE 0
+        END
+    ) AS Underbilled_Times
+FROM Billing AS B
+INNER JOIN Subscriptions AS S
+    ON B.subscription_id = S.subscription_id
+GROUP BY B.customer_id
+HAVING COUNT(*) =
+       SUM(
+           CASE
+               WHEN B.billed_amount < S.contracted_price THEN 1
+               ELSE 0
+           END
+       );
+```
+
+</details>
+
+**Result Analysis**
+
+The analysis identified **3 customers (102, 104, and 108)** who were under-billed on **all 3 billing records** analysed. This indicates a recurring under-billing pattern rather than a one-off billing discrepancy.
+
+Customer 106 was excluded because only **1 of its 3 billing records** was under-billed, meaning the issue was not consistent across the review period.
+
+<img width="692" height="386" alt="image" src="https://github.com/user-attachments/assets/d1188a08-77d3-4657-ab60-a2a961ef7ec4" />
+
+
+**Key Finding:** Customers 102, 104, and 108 show a consistent under-billing pattern across all three billing records, making them priority customers for further billing review.
+
+
+### Under-billing Report: Customers with Undercharged Bills 
+
+**Business Question 2:**
+
+
+Which customers were undercharged for their subscriptions or products during the June–August 2026 review period, and what was the total potential undercharged amount?
+
+**Analysis Logic**
+
+A billing record is considered undercharged when the customer's `billed_amount` is lower than their `contracted_price`.
+
+The query counts the number of undercharged billing records for each customer and calculates the total potential undercharged amount.
+
+```Calculation
+Potential Under-billing = Contracted Price - Billed Amount
+```
+
+<details>
+<summary><strong>View SQL Query</strong></summary>
+
+```sql
+/* Provide a report of customers who have been undercharged
+   for their subscriptions or products for the June–August 2026 review period. */
+
+SELECT
+    B.customer_id,
+    COUNT(*) AS Undercharged_Billtimes,
+    SUM(S.contracted_price - B.billed_amount) AS Total_Undercharged
+FROM Billing AS B
+INNER JOIN Subscriptions AS S
+    ON B.subscription_id = S.subscription_id
+WHERE B.billed_amount < S.contracted_price
+  AND B.bill_date BETWEEN '2026-06-01' AND '2026-08-31'
+GROUP BY B.customer_id;
+```
+</details>
+
+
+### Result Analysis
+
+The analysis identified **4 customers** with potential under-billing during the June–August 2026 review period.
+
+- **Customer 104** had the highest potential under-billing, with **3 undercharged bills** totalling **£450.00**.
+- **Customer 102** had **3 undercharged bills**, resulting in **£150.00** in potential under-billing.
+- **Customer 108** had **3 undercharged bills**, resulting in **£90.00** in potential under-billing.
+- **Customer 106** had **1 undercharged bill**, resulting in **£20.00** in potential under-billing.
+
+Overall, **10 undercharged billing records** were identified, representing **£710.00 in potential under-billing**.
+
+The results show that customers 102, 104, and 108 experienced under-billing across all three months, indicating a recurring billing discrepancy, while customer 106 experienced a one-off under-billing event.
+
+<img width="678" height="334" alt="image" src="https://github.com/user-attachments/assets/9d595081-212d-4620-a7e3-bbd80b1240cc" />
+
+### Key Findings
+
+- **4 customers** were identified with potential under-billing during the June–August 2026 review period.
+- **10 undercharged billing records** were identified, representing **£710.00 in potential under-billing**.
+- Customers **102, 104, and 108** were under-billed across all three months, indicating a recurring under-billing pattern.
+- **Customer 104** had the highest potential under-billing at **£450.00**.
+- **Customer 106** experienced a one-off under-billing issue of **£20.00**.
 
 
 ---
 
 ### 2. Excessive Discount Analysis
 
-```markdown
-### 2. Excessive Discount Analysis
-
-**Business Question**
+**Business Question 1**
 
 Which customers received discounts above the maximum discount threshold permitted for their products?
 
@@ -313,11 +424,32 @@ Which customers received discounts above the maximum discount threshold permitte
 
 A discount is considered excessive when:
 
-```text
+```
 Discount Percentage > Maximum Allowed Discount Percentage
 ```
 
-The analysis compares discount_percentage against the product-level max_discount_pct and calculates the portion of the discount that exceeds the permitted threshold.
+<details>
+<summary><strong>View SQL Query</strong></summary>
+
+```sql
+/* Find customers who have received discounts
+   above the 20% threshold. */
+
+SELECT
+    customer_id,
+    discount_percentage,
+    discount_date,
+    discount_status
+FROM Discounts
+WHERE discount_percentage > 20.00
+ORDER BY discount_percentage DESC;
+```
+</details>
+
+### Result Analysis
+The query identified 4 customers who received discounts above the defined 20% threshold. Customer 107 received the highest discount at 35%, followed by customer 104 at 30%, customer 105 at 25%, and customer 109 at 22%.
+
+<img width="703" height="389" alt="image" src="https://github.com/user-attachments/assets/7c390f82-1646-4f71-9cec-8fd8eedf300f" />
 
 
 ### Key Finding
@@ -325,6 +457,59 @@ The analysis compares discount_percentage against the product-level max_discount
 The analysis identified 4 customers with discounts above the permitted product-level threshold, representing £214.00 in potential excessive discount leakage.
 
 
+
+**Business Question 2**
+
+Which customers received excessive discounts, and how much discount was applied above the maximum threshold allowed for their products?
+
+**Analysis Logic**
+
+A discount is considered excessive when the customer's `discount_percentage` exceeds the product's `max_discount_pct`.
+
+**Calculations:**
+
+- `Total Discount Applied = Standard Price × Discount Percentage / 100`
+- `Excessive Discount % = Discount Percentage - Maximum Allowed Discount %`
+
+<details>
+<summary><strong>View SQL Query</strong></summary>
+
+```sql
+/* Provide a report showing customers
+   who have received excessive discounts, including
+   details of the discount percentage and total discount applied. */
+
+SELECT
+    D.customer_id,
+    D.discount_percentage,
+    P.standard_price * D.discount_percentage / 100 AS Total_discount_applied,
+    D.discount_percentage - P.max_discount_pct AS Excessive_Discount_pct
+FROM Discounts AS D
+INNER JOIN Products AS P
+    ON D.product_id = P.product_id
+WHERE D.discount_percentage > P.max_discount_pct
+ORDER BY Excessive_Discount_pct DESC;
+```
+
+</details>
+
+
+### Result Analysis
+
+The query identified **4 customers** who received discounts above their product-level maximum allowed discount.
+
+Customer **107** received the largest excessive discount at **15 percentage points above the permitted threshold**, while customer **109** had the smallest excess at **2 percentage points**.
+
+The total discount applied based on standard product prices ranged from **£44.00 to £280.00** across the four customers.
+
+<img width="638" height="416" alt="image" src="https://github.com/user-attachments/assets/afb0c331-5d90-439b-948c-5d73de9b2837" />
+
+### Key Finding
+
+- **4 customers** received discounts above the permitted threshold.
+- Customer **107** had the highest excessive discount at **15 percentage points above the limit**.
+- Customer **104** followed with an excess of **10 percentage points**.
+- The analysis highlights customers whose discounts may require closer review against the defined pricing rules.
 ---
 
 
