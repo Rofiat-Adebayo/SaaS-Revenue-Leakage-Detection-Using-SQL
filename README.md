@@ -1,6 +1,33 @@
 # SaaS-Revenue-Leakage-Detection
 A SQL-based revenue assurance project designed to identify potential revenue leakage in a SaaS business by analysing under-billing, excessive discounts, product usage discrepancies, and overdue payments.
 
+## Table of Contents
+
+- [Executive Summary](#executive-summary)
+- [Key Results](#key-results)
+- [Business Problem](#business-problem)
+- [Business Questions](#business-questions)
+- [Review Period & Assumptions](#review-period--assumptions)
+- [Data Model](#data-model)
+- [Data Dictionary](#data-dictionary)
+- [Data Quality Checks](#data-quality-checks)
+- [Database Creation](#database-creation)
+- [SQL Analysis](#sql-analysis)
+  - [Under-billing Analysis](#1-under-billing-analysis)
+  - [Excessive Discount Analysis](#2-excessive-discount-analysis)
+  - [Usage and Billing Discrepancy Analysis](#3-usage-and-billing-discrepancy-analysis)
+  - [Late and Overdue Payment Analysis](#4-late-and-overdue-payment-analysis)
+  - [Executive Revenue Leakage Summary](#5-executive-revenue-leakage-summary)
+- [Business Impact](#business-impact)
+- [Recommendations](#recommendations)
+- [Technical Skills Demonstrated](#technical-skills-demonstrated)
+- [Project Structure](#project-structure)
+- [How to Run the Project](#how-to-run-the-project)
+- [Conclusion](#conclusion)
+
+
+
+
 ## Executive Summary
 
 Revenue leakage can occur when a SaaS business does not collect the full revenue it is contractually or operationally entitled to receive. This project applies SQL Server to investigate potential revenue leakage across customer billing, subscriptions, discounts, product usage, and payments.
@@ -19,6 +46,8 @@ The final analysis provides a consolidated view of potential financial exposure,
 
 The project demonstrates how SQL can be used not only to retrieve data, but also to support **revenue assurance, financial controls, and data-driven business decision-making**.
 
+
+
 ## Key Results
 
 The final revenue leakage analysis identified **£2,124.00 in potential revenue leakage** across the three financial leakage categories analysed during the June–August 2026 review period.
@@ -34,6 +63,8 @@ The final revenue leakage analysis identified **£2,124.00 in potential revenue 
 
 **7 unique customers** were identified across the three revenue leakage categories.
 
+
+
 ### Key Findings
 
 - **£710.00** of potential leakage was identified from customers being billed below the expected amount.
@@ -42,6 +73,7 @@ The final revenue leakage analysis identified **£2,124.00 in potential revenue 
 - **7 unique customers** were affected across the identified leakage categories.
 - Missed payments represented the **largest identified component** of potential leakage, accounting for approximately **56.5%** of the total.
 - Overall, the analysis identified **£2,124.00 in potential financial exposure** requiring further investigation.
+
 
 
 ## Business Problem
@@ -59,6 +91,8 @@ The objective of this project is to use SQL to investigate four key sources of p
 
 The analysis then consolidates the identified financial exposure into an executive revenue leakage summary, allowing the business to understand the scale and sources of potential leakage within the three-month review period.
 
+
+
 ## Business Questions
 
 The analysis was designed to answer the following business questions:
@@ -73,9 +107,10 @@ The analysis was designed to answer the following business questions:
 
 5. **Overall Revenue Leakage:** What was the total potential revenue leakage across under-billing, excessive discounts, and missed payments, and how many unique customers had at least one potential leakage issue?
 
-## Review Period & Assumptions
 
-### Review Period
+
+
+## Review Period & Assumptions
 
 The analysis covers a three-month period from **June 1, 2026 to August 31, 2026**.
 
@@ -98,10 +133,15 @@ The following business rules and assumptions were applied throughout the analysi
 - **Potential Leakage:** The results represent potential revenue leakage identified from the sample data using the defined business rules.
 
 
+
+
 ## Data Model
 
 The project uses a relational data model consisting of six interconnected tables:
 `Customers`, `Products`, `Subscriptions`, `Billing`, `Discounts`, and `Product_Usage`.
+
+
+
 
 ### Entity Relationship Diagram
 
@@ -120,6 +160,7 @@ The project uses a relational data model consisting of six interconnected tables
 | `Billing` | Stores billing and payment information |
 | `Discounts` | Stores customer discounts |
 | `Product_Usage` | Stores customer product usage |
+
 
 
 ### Key Relationships
@@ -160,7 +201,10 @@ The relationships between the tables were designed to maintain referential integ
   Usage records are linked to the relevant subscription through `subscription_id`, allowing actual usage to be compared with the customer's subscribed product and included allowance.
 
 
-  # Data Dictionary
+
+
+
+# Data Dictionary
 
 This data dictionary defines the key tables and fields used in the SaaS Revenue Leakage Detection project.
 
@@ -252,6 +296,8 @@ This data dictionary defines the key tables and fields used in the SaaS Revenue 
 | `recorded_date` | Date the usage record was captured |
 
 
+
+
 ## Data Quality Checks
 
 Before performing the revenue leakage analysis, a series of data quality checks were carried out to identify issues that could affect the accuracy and interpretation of the results.
@@ -266,6 +312,7 @@ The checks focused on duplicate records, missing relationships, invalid financia
 | Invalid discount percentages | Confirms discount percentages fall between 0% and 100% |
 | Invalid financial amounts | Identifies negative or otherwise invalid billing and discount amounts |
 | Invalid date relationships | Checks that billing periods, invoice dates, due dates, and payment dates follow logical chronological order |
+
 
 
 ### Results
@@ -286,9 +333,34 @@ The checks confirmed that no data quality issues were identified in the sample d
 [View Data quality check script](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Data%20quality%20check.sql)
 
 
+
+
+## Database Creation
+
+A relational SQL Server database was created from scratch to support the
+revenue leakage analysis. The database consists of six interconnected tables:
+
+- `Customers`
+- `Products`
+- `Subscriptions`
+- `Billing`
+- `Discounts`
+- `Product_Usage`
+
+The script also includes the sample data used throughout the analysis.
+
+
+
+[View Database Creation & Sample Data SQL](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Database%20Creation.sql)
+
+
+
+
 ## SQL Analysis
 
 The SQL analysis translates the business questions into measurable revenue leakage indicators using SQL Server. Each analysis focuses on a specific leakage area and produces a result that can be reviewed independently before being consolidated into the final revenue leakage summary.
+
+
 
 
 ### 1. Under-billing Analysis
@@ -307,7 +379,7 @@ Potential Under-billing = Expected Amount - Billed Amount
 
   
 <details>
-<summary><strong>View SQL Query</strong></summary>
+<summary><strong>Click to View the SQL Query</strong></summary>
 
 ```sql
 /* Detect under-billed customers
@@ -338,6 +410,8 @@ HAVING COUNT(*) =
 
 </details>
 
+
+
 **Result Analysis**
 
 The analysis identified **3 customers (102, 104, and 108)** who were under-billed on **all 3 billing records** analysed. This indicates a recurring under-billing pattern rather than a one-off billing discrepancy.
@@ -348,6 +422,7 @@ Customer 106 was excluded because only **1 of its 3 billing records** was under-
 
 
 **Key Finding:** Customers 102, 104, and 108 show a consistent under-billing pattern across all three billing records, making them priority customers for further billing review.
+
 
 
 ### Under-billing Report: Customers with Undercharged Bills 
@@ -368,7 +443,7 @@ Potential Under-billing = Contracted Price - Billed Amount
 ```
 
 <details>
-<summary><strong>View SQL Query</strong></summary>
+<summary><strong>Click to View SQL Query</strong></summary>
 
 ```sql
 /* Provide a report of customers who have been undercharged
@@ -386,6 +461,7 @@ WHERE B.billed_amount < S.contracted_price
 GROUP BY B.customer_id;
 ```
 </details>
+
 
 
 ### Result Analysis
@@ -428,8 +504,11 @@ A discount is considered excessive when:
 Discount Percentage > Maximum Allowed Discount Percentage
 ```
 
+
+
+
 <details>
-<summary><strong>View SQL Query</strong></summary>
+ <summary><strong>Click to View SQL Query</strong></summary>
 
 ```sql
 /* Find customers who have received discounts
@@ -446,6 +525,9 @@ ORDER BY discount_percentage DESC;
 ```
 </details>
 
+
+
+
 ### Result Analysis
 The query identified 4 customers who received discounts above the defined 20% threshold. Customer 107 received the highest discount at 35%, followed by customer 104 at 30%, customer 105 at 25%, and customer 109 at 22%.
 
@@ -458,7 +540,7 @@ The analysis identified 4 customers with discounts above the permitted product-l
 
 
 
-**Business Question 2**
+### Business Question 2**
 
 Which customers received excessive discounts, and how much discount was applied above the maximum threshold allowed for their products?
 
@@ -471,8 +553,11 @@ A discount is considered excessive when the customer's `discount_percentage` exc
 - `Total Discount Applied = Standard Price × Discount Percentage / 100`
 - `Excessive Discount % = Discount Percentage - Maximum Allowed Discount %`
 
+
+
+
 <details>
-<summary><strong>View SQL Query</strong></summary>
+<summary><strong>Click to View the SQL Query</strong></summary>
 
 ```sql
 /* Provide a report showing customers
@@ -494,6 +579,8 @@ ORDER BY Excessive_Discount_pct DESC;
 </details>
 
 
+
+
 ### Result Analysis
 
 The query identified **4 customers** who received discounts above their product-level maximum allowed discount.
@@ -513,41 +600,111 @@ The total discount applied based on standard product prices ranged from **£44.0
 ---
 
 
-### 3. Usage vs Billing Analysis
+
+### 3. Usage and Billing Discrepancy Analysis
 
 **Business Question**
 
-Which customers are using more of their product allowance than is included in their subscription?
+How does customer product usage compare with their billing records?
 
 **Analysis Logic**
 
-A potential usage discrepancy exists when:
+The analysis combines product usage and billing records for the same customer and product to compare usage levels with billing information.
 
-```text
-Active Users > Included Users
+The analysis examines:
+
+- `active_users` against `included_users` to identify usage above the customer's plan allowance.
+- `expected_amount` against `billed_amount` to identify billing differences.
+- `additional_users` to show how far usage exceeds the included allowance.
+- `underbilled_amount` to quantify any difference between the expected and billed amounts.
+
+
+
+
+ <details>
+<summary><strong>Click to View the SQL Query</strong></summary>
+
+```sql
+/* Write a query to compare product usage data with billing records.
+   For example, compare the number of active users of a product
+   with the billed amount. */
+
+SELECT
+    P.customer_id,
+    P.product_id,
+    P.usage_month,
+    P.active_users,
+    P.included_users,
+    GREATEST(P.active_users - P.included_users, 0) AS Additional_users,
+    B.billed_amount,
+    B.expected_amount,
+    B.expected_amount - B.billed_amount AS Underbilled_amount,
+    B.bill_date,
+    B.payment_status
+FROM Product_Usage AS P
+INNER JOIN Billing AS B
+    ON P.customer_id = B.customer_id
+   AND P.product_id = B.product_id
+   AND YEAR(P.usage_month) = YEAR(B.bill_date)
+   AND MONTH(P.usage_month) = MONTH(B.bill_date);
 ```
 
-The analysis compares ```active_users``` with the ```included_users``` allowance associated with each customer's product subscription.
+</details>
 
-```/*Write a query to compare product usage data with billing records.
-For example, compare the number of active users of a product with the billed amount.*/
 
-SELECT 
-       P.product_id,
-	   P.usage_month,
-	   P.active_users,
-	   P.included_users,
-GREATEST(P.active_users-P.included_users,0) AS Additional_users,
-		B.billed_amount,
-	    B.expected_amount,
-	    B.expected_amount-B.billed_amount AS Underbilled_amount,
-	    B.bill_date, 
-	    B.payment_status
-FROM Product_Usage P
-JOIN Billing B
-ON P.product_id= B.product_id
-AND P.customer_id= B.customer_id
 
+
+
+### Result Analysis
+
+The analysis provides a side-by-side view of customer product usage and billing information for the same billing period.
+
+The results show that some customers were using more users than their plans included, while others were billed at their expected amounts. The comparison also highlights customers where usage and billing discrepancies occur at the same time.
+
+For example, customer **102** recorded **68 active users** against **50 included users** and was billed **£300** against an expected **£350**, resulting in **£50 of potential under-billing**.
+
+Customer **104** recorded **245 active users** against **200 included users** and was billed **£650** against an expected **£800**, resulting in **£150 of potential under-billing**.
+
+Customer **107** recorded **270 active users** against **200 included users**, but was billed the full expected amount of **£800**, showing that higher usage does not automatically result in a billing discrepancy.
+
+
+<img width="686" height="335" alt="image" src="https://github.com/user-attachments/assets/59b6c3dd-b411-4a9c-86af-816001344cb6" />
+
+
+### Key Findings
+
+- The analysis identified customers where **usage exceeded their included allowance**.
+- It also identified cases where **higher usage occurred alongside under-billing**.
+- Customers **102 and 104** showed both a usage discrepancy and a billing discrepancy.
+- Customer **107** exceeded the included usage allowance but had **no billing shortfall**, demonstrating that usage and billing discrepancies do not always occur together.
+- The analysis demonstrates how combining usage and billing data can help identify potential areas for further revenue review.
+
+### 2.Usage and Billing Discrepancy Analysis
+
+**Business Question**
+
+Which customers have used more of a product than they have been billed for?
+
+**Analysis Logic**
+
+A customer is identified as having a usage and billing discrepancy when both conditions are met:
+
+- `Active Users > Included Users`
+- `Expected Amount > Billed Amount`
+
+**Calculations:**
+
+- `Additional Users = Active Users - Included Users`
+- `Under-billed Amount = Expected Amount - Billed Amount`
+
+
+
+
+
+<details>
+<summary><strong>Click to View the SQL Query</strong></summary>
+
+```sql
 -- Identify any discrepancies where customers have used
 -- more of a product than they have been billed for.
 
@@ -561,49 +718,71 @@ SELECT
     B.expected_amount,
     B.billed_amount,
     B.expected_amount - B.billed_amount AS underbilled_amount
-FROM Product_Usage P
-JOIN Billing B
+FROM Product_Usage AS P
+INNER JOIN Billing AS B
     ON P.customer_id = B.customer_id
     AND P.product_id = B.product_id
+    AND YEAR(P.usage_month) = YEAR(B.bill_date)
+    AND MONTH(P.usage_month) = MONTH(B.bill_date)
 WHERE P.active_users > P.included_users
   AND B.expected_amount > B.billed_amount;
 ```
 
+</details>
+
+
+
+
+
+### Result Analysis
+
+The analysis identified **2 customers** whose product usage exceeded their included allowance while their billed amount was below the expected amount.
+
+- **Customer 102** recorded **18 additional users** and **£50.00** in potential under-billing.
+- **Customer 104** recorded **45 additional users** and **£150.00** in potential under-billing.
+
+Together, the two customers recorded **63 additional users** above their included allowances and **£200.00 in potential under-billing**.
+
+<img width="677" height="382" alt="image" src="https://github.com/user-attachments/assets/33884336-17eb-4e80-99cc-ff3419b71a3d" />
+
 
 ### Key Findings
-The analysis identified 5 customers whose recorded active users exceeded the number of users included in their plans.
 
-<img width="703" height="368" alt="image" src="https://github.com/user-attachments/assets/30c4cd2c-29ee-499b-a159-b6ef4977b783" />
-
-
-One accuracy point: this analysis identifies **usage discrepancies**, not a monetary leakage amount by itself. The actual financial impact would require a rule for charging those additional users.
-
+- **2 customers** were identified with both a usage discrepancy and a billing shortfall.
+- Customer **104** had the largest discrepancy, with **45 additional users** and **£150.00** in potential under-billing.
+- Customer **102** had **18 additional users** and **£50.00** in potential under-billing.
+- The analysis demonstrates that combining usage and billing data can identify customers where increased usage coincides with a potential billing shortfall.
 ---
 
-### 4. Overdue Payment Analysis
 
-```
-### 4. Overdue Payment Analysis
+### 4. Late and Overdue Payment Analysis
 
 **Business Question**
 
-Which customers have unpaid or overdue invoices, and what is the value of the outstanding payments?
+Which customers have missed payments or have overdue invoices?
 
 **Analysis Logic**
 
-An invoice is considered overdue when the payment has not been recorded and the due date has passed.
+An invoice is identified as a potential missed or overdue payment when either:
 
-```text
-Payment Date IS NULL
-AND Due Date < Current Date
-```
+- `payment_status = 'Overdue'`, or
+- the `due_date` has passed and `payment_date` is `NULL`.
 
-The analysis identifies unpaid invoices that have passed their due dates and reports the associated invoice amounts.
+This allows the analysis to identify unpaid invoices using both the recorded payment status and the underlying payment dates.
 
-```-- Write a query to identify customers who have missed payments or have overdue invoices.
+
+
+
+
+<details>
+<summary><strong>Click to View the SQL Query</strong></summary>
+
+```sql
+-- Write a query to identify customers who have missed payments
+-- or have overdue invoices.
 
 SELECT
-   customer_id,
+    customer_id,
     billed_amount,
     due_date,
     payment_date,
@@ -613,12 +792,63 @@ WHERE payment_status = 'Overdue'
    OR (
         due_date < GETDATE()
         AND payment_date IS NULL
-      )
-	 
+      );
+```
+
+</details>
+
+
+
+
+
+### Result Analysis
+
+The analysis identified **3 customers** with overdue invoices and no recorded payment.
+
+- **Customer 105** has an overdue invoice of **£200.00**.
+- **Customer 107** has an overdue invoice of **£800.00**, representing the largest outstanding amount.
+- **Customer 109** has an overdue invoice of **£200.00**.
+
+The combined value of the identified overdue invoices is **£1,200.00**.
+
+<img width="637" height="350" alt="image" src="https://github.com/user-attachments/assets/15b8fb34-27d6-448b-b89f-105e5df4176c" />
+
+
+### Key Findings
+
+- **3 customers** were identified with overdue or missed payments.
+- The total value of the identified overdue invoices is **£1,200.00**.
+- **Customer 107** has the largest overdue invoice at **£800.00**.
+- All three invoices have a `NULL` payment date, indicating that no payment has been recorded for these invoices.
+---
+
+
+
+### Business Question 2**
+
+Which customers have outstanding invoices, and what are the invoice amounts and payment due dates?
+
+**Analysis Logic**
+
+An invoice is considered outstanding when no payment has been recorded.
+
+This is identified using:
+
+**`payment_date IS NULL`**
+
+The query returns the customer, invoice ID, invoice amount, due date, and current payment status.
+
+
+
+
+<details>
+<summary><strong>Click to View the SQL Query</strong></summary>
+
+```sql
 -- Provide details of customers with outstanding invoices,
 -- including the invoice amount and the date the payment was due.
 
-SELECT 
+SELECT
     customer_id,
     billing_id AS Invoice_id,
     billed_amount AS Invoice_amount,
@@ -628,14 +858,34 @@ FROM Billing
 WHERE payment_date IS NULL;
 ```
 
-### Key Finding
-
-The analysis identified 3 customers with overdue invoices, representing £1,200.00 in potential missed-payment exposure.
-
-<img width="683" height="354" alt="image" src="https://github.com/user-attachments/assets/35f29e32-fd73-44db-a94a-b9c1be9431c0" />
+</details>
 
 
----
+
+
+
+### Result Analysis
+
+The query identified **3 outstanding invoices** with no recorded payment.
+
+- **Customer 105** has an outstanding invoice of **£200.00**, due on **15 August 2026**.
+- **Customer 107** has an outstanding invoice of **£800.00**, due on **15 August 2026**.
+- **Customer 109** has an outstanding invoice of **£200.00**, due on **15 August 2026**.
+
+The combined value of the outstanding invoices is **£1,200.00**.
+
+All three outstanding invoices are marked as **Overdue** in the sample data.
+
+
+<img width="689" height="395" alt="image" src="https://github.com/user-attachments/assets/2ca19970-65b0-4841-adbe-9be86c64ac22" />
+
+### Key Findings
+
+- **3 outstanding invoices** were identified.
+- The total outstanding amount is **£1,200.00**.
+- Customer **107** has the largest outstanding invoice at **£800.00**.
+- All identified outstanding invoices have passed their payment due date and are marked as overdue.
+
 
 
 
@@ -643,38 +893,25 @@ The analysis identified 3 customers with overdue invoices, representing £1,200.
 
 **Business Question**
 
-What is the total potential revenue leakage across under-billing, excessive discounts, and missed payments during the June–August 2026 review period?
+What is the total potential revenue leakage from under-billing, excessive discounts, and missed payments, and how many unique customers have at least one potential revenue leakage issue?
 
 **Analysis Logic**
 
-The final query consolidates the three financial leakage categories into a single executive-level summary:
+The final query consolidates the three main financial leakage categories identified in the analysis:
 
-- Under-billing
-- Excessive discounts
-- Missed payments
+- **Under-billing:** `Expected Amount - Billed Amount`
+- **Excessive Discounts:** The portion of a discount that exceeds the product's maximum permitted discount
+- **Missed Payments:** Unpaid invoices where the due date has passed
+- **Customers with Potential Revenue Leakage:** Unique customers identified across all three categories
 
-It also identifies the number of unique customers with at least one potential revenue leakage issue.
+The `UNION` operation is used to combine customers from the three leakage categories while removing duplicates, ensuring that each customer is counted only once.
 
-**Result**
 
-| Revenue Leakage Category | Potential Leakage |
-|---|---:|
-| Under-billing | £710.00 |
-| Excessive Discounts | £214.00 |
-| Missed Payments | £1,200.00 |
-| **Total Potential Revenue Leakage** | **£2,124.00** |
 
-### Customers with Potential Revenue Leakage
 
-**7 unique customers** were identified with at least one potential revenue leakage issue during the review period.
 
-<img width="932" height="445" alt="image" src="https://github.com/user-attachments/assets/4298c1ad-4a56-4b5b-865c-2a9d28a9440c" />
-
-**Key Finding**
-
-The analysis identified **£2,124.00 in potential revenue leakage** across the three financial leakage categories.
-
-Missed payments represented the largest component at **£1,200.00**, followed by under-billing at **£710.00** and excessive discounts at **£214.00**.
+<details>
+<summary><strong>Click to View the SQL Query</strong></summary>
 
 ```sql
 /* EXECUTIVE REVENUE LEAKAGE SUMMARY
@@ -777,7 +1014,35 @@ SELECT
     CAST(COUNT(*) AS VARCHAR(20))
 FROM AffectedCustomers;
 ```
-<img width="707" height="382" alt="image" src="https://github.com/user-attachments/assets/0b71151f-a5d6-4e1b-aa67-2486331cd644" />
+
+</details>
+
+
+
+
+
+### Result Analysis
+
+The final analysis identified **£2,124.00 in potential revenue leakage** across the June–August 2026 review period.
+
+- **Under-billing:** £710.00
+- **Excessive discounts:** £214.00
+- **Missed payments:** £1,200.00
+
+A total of **7 unique customers** were identified with at least one potential revenue leakage issue across the three categories.
+
+<img width="693" height="383" alt="image" src="https://github.com/user-attachments/assets/e626a3b6-c14f-4d8b-a7a9-193cdf18baba" />
+
+
+
+### Key Findings
+
+- **£2,124.00** in total potential revenue leakage was identified.
+- **Missed payments** represented the largest component at **£1,200.00**, accounting for approximately **56.5%** of the total.
+- **Under-billing** accounted for **£710.00**, or approximately **33.4%** of the total.
+- **Excessive discounts** accounted for **£214.00**, or approximately **10.1%** of the total.
+- **7 unique customers** had at least one potential revenue leakage issue.
+- Missed payments and under-billing were the two largest sources of identified financial exposure in the sample data.
 
 
 
@@ -801,12 +1066,151 @@ From a business perspective, the analysis shows how structured SQL checks can he
 - Prioritise areas of potential revenue exposure for further investigation
 - Strengthen financial and revenue assurance processes
 
-> **Portfolio context:** The figures above are based on the sample dataset created for this project and demonstrate the type of business insight that can be generated from a structured revenue leakage analysis.
+> **Portfolio context:** The figures are based on the sample dataset created for this project and demonstrate how structured SQL analysis can be used to identify potential revenue leakage and generate actionable business insights.
+
+
+
+## Recommendations
+
+Based on the revenue leakage findings, the following actions could help reduce potential leakage:
+
+1. **Strengthen billing controls**  
+   Introduce automated checks that compare expected charges with actual billed amounts to identify under-billing before invoices are finalised.
+
+2. **Implement discount controls**  
+   Require approval for discounts that exceed the maximum threshold defined for each product.
+
+3. **Monitor customer usage**  
+   Regularly compare actual product usage with included subscription allowances to identify customers whose usage may require plan or billing review.
+
+4. **Improve overdue payment monitoring**  
+   Implement automated alerts for invoices approaching or passing their due dates to support timely payment collection.
+
+5. **Prioritise high-value leakage cases**  
+   Focus investigation and corrective action on the customers and leakage categories with the largest potential financial exposure.
+
+
+
+## Technical Skills Demonstrated
+
+This project demonstrates the following technical, database, and analytical skills:
+
+### Database Development
+
+- SQL Server database creation
+- Relational database design
+- Schema design and table creation
+- Primary and foreign key implementation
+- One-to-many table relationships
+- Data types and column design
+- `CREATE TABLE` statements
+- `INSERT` statements for sample data generation
+- `CHECK` and `UNIQUE` constraints
+- Referential integrity
+
+### SQL & Data Analysis
+
+- `INNER JOIN` and multi-table joins
+- `GROUP BY` and `HAVING`
+- Aggregate functions such as `SUM()` and `COUNT()`
+- `COUNT(DISTINCT)`
+- `CASE` expressions
+- `UNION` and `UNION ALL`
+- Common Table Expressions (CTEs)
+- Date filtering and date functions
+- Conditional logic and business rules
+- Revenue leakage calculations
+
+### Data Quality & Validation
+
+- Duplicate record detection
+- Referential integrity checks
+- Financial value validation
+- Discount percentage validation
+- Date consistency checks
+- Data quality assessment before analysis
+
+### Business & Analytical Skills
+
+- Revenue leakage analysis
+- Revenue assurance
+- Billing discrepancy analysis
+- Discount control analysis
+- Customer usage analysis
+- Payment and overdue invoice analysis
+- Translating business questions into SQL logic
+- Quantifying potential financial exposure
+- Converting SQL results into actionable business insights
 
 
 
 
+## Project Structure
 
+```
+saas-revenue-leakage/
+│
+├── README.md
+│
+├── database/
+│   ├── 01_create_tables.sql
+│   ├── 02_insert_sample_data.sql
+│   └── 03_data_quality_checks.sql
+│
+├── sql/
+│   ├── 01_underbilling.sql
+│   ├── 02_excessive_discounts.sql
+│   ├── 03_usage_vs_billing.sql
+│   ├── 04_overdue_invoices.sql
+│   └── 05_revenue_leakage_summary.sql
+│
+└── docs/
+    └── data_dictionary.md
+```
+
+
+## How to Run the Project
+
+### 1. Create the Database and Load Sample Data
+
+Run the database setup script. It creates the tables, relationships,
+constraints, and inserts the sample data.
+
+[View Database Creation & Sample Data SQL](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Database%20Creation.sql)
+
+
+### 2. Run Data Quality Checks
+
+[View Data Quality Checks SQL](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Data%20quality%20check.sql)
+
+
+### 3. Run the Analysis Queries
+
+- [Under-billing](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Underbilled_Customers.sql)
+- [Excessive Discounts](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Over-discounted%20customers.sql)
+- [Usage and Billing Discrepancy](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Product%20usage%20vs%20billing.sql)
+- [Overdue Payments](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Late%20payment%20detection.sql)
+- [Revenue Leakage Summary](https://github.com/Rofiat-Adebayo/SaaS-Revenue-Leakage-Detection-Using-SQL/blob/main/Revenue%20leekage%20report.sql)
+
+
+
+
+## Conclusion
+
+This project demonstrates how SQL can be used to investigate potential revenue leakage within a SaaS business by combining customer, subscription, billing, discount, product usage, and payment data.
+
+The analysis identified **£2,124.00 in potential revenue leakage** across under-billing, excessive discounts, and missed payments, with **7 unique customers** having at least one potential leakage issue during the review period.
+
+Beyond identifying individual discrepancies, the project demonstrates an end-to-end SQL workflow covering:
+
+- Database and relational schema design
+- Sample data creation
+- Data quality validation
+- Business-focused SQL analysis
+- Revenue leakage quantification
+- Translating SQL results into actionable business insights
+
+Overall, the project demonstrates how structured SQL analysis can support **revenue assurance, financial control, and data-driven decision-making**.
 
 
 
